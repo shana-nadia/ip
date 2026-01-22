@@ -5,13 +5,23 @@ public class Duchess {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Good day to you! I'm Duchess.");
         System.out.println("What can I do for you today?");
+
+        TodoList todolist = new TodoList();
+
         while (true) {
             String input = scanner.nextLine();
             if (input.equals("bye")) {
                 System.out.println("Bye! See you again next time!");
                 break;
             }
-            System.out.println(input);
+            if (input.equals("list")) {
+                todolist.print();
+            } else {
+                todolist.addTask(input);
+                System.out.println("added: " + input);
+            }
         }
+
+        scanner.close();
     }
 }
