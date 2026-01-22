@@ -16,7 +16,11 @@ public class TodoList {
 
     public void print() {
         for (int i = 0; i < this.tasks.size(); i++) {
-            System.out.println((i + 1) + ". " + this.tasks.get(i).toString());
+            System.out.println((i + 1) + ". " + getTask(i));
         }
+    }
+
+    public Task getTask(int taskNumber) {
+        return this.tasks.get(taskNumber);
     }
 }
