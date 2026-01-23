@@ -27,4 +27,8 @@ public class TodoList {
     public int size() {
         return this.tasks.size();
     }
+
+    public Task deleteTask(int taskNumber) {
+        return tasks.remove(taskNumber);
+    }
 }

@@ -35,7 +35,15 @@ public class Duchess {
                     todolist.getTask(taskNumber).mark();
                     System.out.println("Congratulations on finishing your task! Task has been marked accordingly:\n" + todolist.getTask(taskNumber));
                 } else if (command.equals("unmark")) {
+                    if (words.length < 2) {
+                        throw new DuchessException("Please specify which task number to unmark :(");
+                    }
                     int taskNumber = Integer.parseInt(words[1]) - 1;
+
+                    if (taskNumber < 0 || taskNumber >= todolist.size()) {
+                        throw new DuchessException("Oh no! That task number does not exist :(");
+                    }
+
                     todolist.getTask(taskNumber).unmark();
                     System.out.println("Got it! Task has been unmarked accordingly:\n" + todolist.getTask(taskNumber));
                 } else if (command.equals("todo")) {
@@ -44,7 +52,11 @@ public class Duchess {
                     }
                     Task task = new TodoTask(words[1]);
                     todolist.addTask(task);
-                    System.out.println("Sure! Task added:\n" + task);
+                    System.out.println(
+                            "Sure! Task added:\n"
+                                    + task + "\n"
+                            + "Now you have " + todolist.size() + " tasks left!"
+                    );
                 } else if (command.equals("deadline")) {
                     if (words.length < 2) {
                         throw new DuchessException("Oh no! Can't have a deadline task without something to do :");
@@ -61,7 +73,11 @@ public class Duchess {
                     Task task = new DeadlineTask(description, deadline);
                     todolist.addTask(task);
 
-                    System.out.println("Sure! Task added:\n" + task);
+                    System.out.println(
+                            "Sure! Task added:\n"
+                                    + task + "\n"
+                                    + "Now you have " + todolist.size() + " tasks left!"
+                    );
                 } else if (command.equals("event")) {
                     if (words.length < 2) {
                         throw new DuchessException("Oh no! Can't have an event task without an event :(");
@@ -80,7 +96,28 @@ public class Duchess {
                     Task task = new EventTask(description, start, end);
                     todolist.addTask(task);
 
-                    System.out.println("Sure! Task added:\n" + task);
+                    System.out.println(
+                            "Sure! Task added:\n"
+                                    + task + "\n"
+                                    + "Now you have " + todolist.size() + " tasks left!"
+                    );
+                } else if (command.equals("delete")) {
+                    if (words.length < 2) {
+                        throw new DuchessException("Please specify which task number to delete :(");
+                    }
+
+                    int taskNumber = Integer.parseInt(words[1]) - 1;
+
+                    if (taskNumber < 0 || taskNumber >= todolist.size()) {
+                        throw new DuchessException("Oh no! That task number does not exist :(");
+                    }
+
+                    Task deleted = todolist.deleteTask(taskNumber);
+                    System.out.println(
+                            "Okay! I have removed this task:\n"
+                            + deleted + "\n"
+                            + "Now you have " + todolist.size() + " tasks left!"
+                    );
                 } else {
                     throw new DuchessException("Sorry! I don't know what that command means :(");
                 }
