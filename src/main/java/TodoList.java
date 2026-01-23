@@ -23,4 +23,8 @@ public class TodoList {
     public Task getTask(int taskNumber) {
         return this.tasks.get(taskNumber);
     }
+
+    public int size() {
+        return this.tasks.size();
+    }
 }
