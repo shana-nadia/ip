@@ -65,7 +65,7 @@ public class FileStorage {
             FileWriter fw = new FileWriter("data/duchess.txt");
             for (int i = 0; i < todolist.size(); i++) {
                 Task task = todolist.getTask(i);
-                fw.write(task.writeToFile() + System.lineSeparator());
+                fw.write(task.toFileFormat() + System.lineSeparator());
             }
             fw.close();
         } catch (IOException e) {
