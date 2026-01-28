@@ -62,6 +62,10 @@ public class FileStorage {
      */
     public static void writeTasks(TodoList todolist) {
         try {
+            File dir = new File("data");
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
             FileWriter fw = new FileWriter("data/duchess.txt");
             for (int i = 0; i < todolist.size(); i++) {
                 Task task = todolist.getTask(i);

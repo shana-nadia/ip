@@ -1,9 +1,17 @@
 import java.util.Scanner;
 
+/**
+ * Starting point of the Duchess chatbot.
+ * Handles user commands and input and responds accordingly.
+ */
 public class Duchess {
+    /**
+     * Runs the Duchess chatbot.
+     * @param args Command-line arguments, not used
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        TodoList todolist = new TodoList();
+        TodoList todolist = FileStorage.fetchTasks();
 
         System.out.println("Good day to you! I'm Duchess.");
         System.out.println("What can I do for you today?");
@@ -35,6 +43,7 @@ public class Duchess {
                     }
 
                     todolist.getTask(taskNumber).mark();
+                    FileStorage.writeTasks(todolist);
                     System.out.println("Congratulations on finishing your task! Task has been marked accordingly:\n" + todolist.getTask(taskNumber));
                     break;
                 }
@@ -49,6 +58,7 @@ public class Duchess {
                     }
 
                     todolist.getTask(taskNumber).unmark();
+                    FileStorage.writeTasks(todolist);
                     System.out.println("Got it! Task has been unmarked accordingly:\n" + todolist.getTask(taskNumber));
                     break;
                 }
@@ -80,6 +90,7 @@ public class Duchess {
 
                     Task task = new DeadlineTask(description, deadline);
                     todolist.addTask(task);
+                    FileStorage.writeTasks(todolist);
 
                     System.out.println(
                             "Sure! Task added:\n"
@@ -105,6 +116,7 @@ public class Duchess {
 
                     Task task = new EventTask(description, start, end);
                     todolist.addTask(task);
+                    FileStorage.writeTasks(todolist);
 
                     System.out.println(
                             "Sure! Task added:\n"
@@ -125,6 +137,7 @@ public class Duchess {
                     }
 
                     Task deleted = todolist.deleteTask(taskNumber);
+                    FileStorage.writeTasks(todolist);
                     System.out.println(
                             "Okay! I have removed this task:\n"
                                     + deleted + "\n"
