@@ -1,14 +1,19 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Represents a task that happens during a specific time period.
  */
 public class EventTask extends Task {
-    private final String start;
-    private final String end;
+    private final LocalDateTime start;
+    private final LocalDateTime end;
+    private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+    private static final DateTimeFormatter PRINT_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy, h a");
 
     public EventTask(String description, String start, String end) {
         super(description);
-        this.start = start;
-        this.end = end;
+        this.start = LocalDateTime.parse(start, INPUT_FORMAT);
+        this.end = LocalDateTime.parse(end, INPUT_FORMAT);
     }
 
     /**
@@ -21,7 +26,7 @@ public class EventTask extends Task {
     @Override
     public String toFileFormat() {
         return "E | " + (super.isDone() ? "1" : "0") + " | " + super.getDescription()
-                + " | " + this.start + " | " + this.end;
+                + " | " + this.start.format(INPUT_FORMAT) + " | " + this.end.format(INPUT_FORMAT);
     }
 
     /**
@@ -31,6 +36,7 @@ public class EventTask extends Task {
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + this.start + " to: " + this.end + ")";
+        return "[E]" + super.toString() + " (from: " + this.start.format(PRINT_FORMAT)
+                + " to: " + this.end.format(PRINT_FORMAT) + ")";
     }
 }
