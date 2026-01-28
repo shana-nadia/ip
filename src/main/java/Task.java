@@ -1,13 +1,21 @@
 /**
  * Represents one task for the user to complete.
  */
-public class Task {
+public abstract class Task {
     private boolean isDone;
     private final String description;
 
     public Task(String description) {
         this.isDone = false;
         this.description = description;
+    }
+
+    public boolean isDone() {
+        return this.isDone;
+    }
+
+    public String getDescription() {
+        return this.description;
     }
 
     public void mark() {
@@ -21,6 +29,8 @@ public class Task {
     public String getMark() {
         return isDone ? "X" : " ";
     }
+
+    public abstract String toFileFormat();
 
     @Override
     public String toString() {

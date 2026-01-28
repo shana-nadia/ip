@@ -1,29 +1,39 @@
 import java.util.Scanner;
 
+/**
+ * Starting point of the Duchess chatbot.
+ * Handles user commands and input and responds accordingly.
+ */
 public class Duchess {
+    /**
+     * Runs the Duchess chatbot.
+     * @param args Command-line arguments, not used
+     */
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        TodoList todolist = new TodoList();
+        TodoList todolist = FileStorage.fetchTasks();
 
         System.out.println("Good day to you! I'm Duchess.");
         System.out.println("What can I do for you today?");
 
+        label:
         while (true) {
             try {
                 String input = scanner.nextLine();
                 String[] words = input.split(" ", 2);
                 String command = words[0];
 
-                if (command.equals("bye")) {
+                switch (command) {
+                case "bye":
                     System.out.println("Bye! See you again next time!");
-                    break;
-                }
-                if (command.equals("list")) {
+                    break label;
+                case "list":
                     System.out.println("Here is your todo list!");
                     todolist.print();
-                } else if (command.equals("mark")) {
+                    break;
+                case "mark": {
                     if (words.length < 2) {
-                        throw  new DuchessException("Please specify which task number to mark :(");
+                        throw new DuchessException("Please specify which task number to mark :(");
                     }
 
                     int taskNumber = Integer.parseInt(words[1]) - 1;
@@ -33,8 +43,11 @@ public class Duchess {
                     }
 
                     todolist.getTask(taskNumber).mark();
+                    FileStorage.writeTasks(todolist);
                     System.out.println("Congratulations on finishing your task! Task has been marked accordingly:\n" + todolist.getTask(taskNumber));
-                } else if (command.equals("unmark")) {
+                    break;
+                }
+                case "unmark": {
                     if (words.length < 2) {
                         throw new DuchessException("Please specify which task number to unmark :(");
                     }
@@ -45,8 +58,11 @@ public class Duchess {
                     }
 
                     todolist.getTask(taskNumber).unmark();
+                    FileStorage.writeTasks(todolist);
                     System.out.println("Got it! Task has been unmarked accordingly:\n" + todolist.getTask(taskNumber));
-                } else if (command.equals("todo")) {
+                    break;
+                }
+                case "todo": {
                     if (words.length < 2 || words[1].trim().isEmpty()) {
                         throw new DuchessException("Oh no! Can't have a todo task without something to do :(");
                     }
@@ -55,9 +71,11 @@ public class Duchess {
                     System.out.println(
                             "Sure! Task added:\n"
                                     + task + "\n"
-                            + "Now you have " + todolist.size() + " tasks left!"
+                                    + "Now you have " + todolist.size() + " tasks left!"
                     );
-                } else if (command.equals("deadline")) {
+                    break;
+                }
+                case "deadline": {
                     if (words.length < 2) {
                         throw new DuchessException("Oh no! Can't have a deadline task without something to do :");
                     }
@@ -72,13 +90,16 @@ public class Duchess {
 
                     Task task = new DeadlineTask(description, deadline);
                     todolist.addTask(task);
+                    FileStorage.writeTasks(todolist);
 
                     System.out.println(
                             "Sure! Task added:\n"
                                     + task + "\n"
                                     + "Now you have " + todolist.size() + " tasks left!"
                     );
-                } else if (command.equals("event")) {
+                    break;
+                }
+                case "event": {
                     if (words.length < 2) {
                         throw new DuchessException("Oh no! Can't have an event task without an event :(");
                     }
@@ -95,13 +116,16 @@ public class Duchess {
 
                     Task task = new EventTask(description, start, end);
                     todolist.addTask(task);
+                    FileStorage.writeTasks(todolist);
 
                     System.out.println(
                             "Sure! Task added:\n"
                                     + task + "\n"
                                     + "Now you have " + todolist.size() + " tasks left!"
                     );
-                } else if (command.equals("delete")) {
+                    break;
+                }
+                case "delete": {
                     if (words.length < 2) {
                         throw new DuchessException("Please specify which task number to delete :(");
                     }
@@ -113,12 +137,15 @@ public class Duchess {
                     }
 
                     Task deleted = todolist.deleteTask(taskNumber);
+                    FileStorage.writeTasks(todolist);
                     System.out.println(
                             "Okay! I have removed this task:\n"
-                            + deleted + "\n"
-                            + "Now you have " + todolist.size() + " tasks left!"
+                                    + deleted + "\n"
+                                    + "Now you have " + todolist.size() + " tasks left!"
                     );
-                } else {
+                    break;
+                }
+                default:
                     throw new DuchessException("Sorry! I don't know what that command means :(");
                 }
             } catch (DuchessException e) {
