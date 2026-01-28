@@ -1,24 +1,30 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 /**
  * Represents a task to be completed by a certain deadline.
  */
 public class DeadlineTask extends Task {
-    private final String deadline;
+    private final LocalDate deadline;
+    private static final DateTimeFormatter INPUT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter PRINT_FORMAT = DateTimeFormatter.ofPattern("MMM d yyyy");
 
     public DeadlineTask(String description, String deadline) {
         super(description);
-        this.deadline = deadline;
+        this.deadline = LocalDate.parse(deadline);
     }
 
     /**
      * Returns a string representation of this DeadlineTask to save to data file.
-     * Format: D | 0/1 | description | deadline
+     * Format: D | 0/1 | description | deadline (yyyy-MM-dd format)
      * where 0 means not done and 1 means done.
      *
      * @return formatted string to save to file
      */
     @Override
     public String toFileFormat() {
-        return "D | " + (super.isDone() ? "1" : "0") + " | " + super.getDescription() + " | " + this.deadline;
+        return "D | " + (super.isDone() ? "1" : "0") + " | "
+                + super.getDescription() + " | " + this.deadline.format(INPUT_FORMAT);
     }
 
     /**
@@ -28,6 +34,6 @@ public class DeadlineTask extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + this.deadline + ")";
+        return "[D]" + super.toString() + " (by: " + this.deadline.format(PRINT_FORMAT) + ")";
     }
 }
