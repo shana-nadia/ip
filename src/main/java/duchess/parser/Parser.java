@@ -1,3 +1,8 @@
+package duchess.parser;
+
+/**
+ * Handles parsing of commands inputted by user.
+ */
 public class Parser {
 
     /**

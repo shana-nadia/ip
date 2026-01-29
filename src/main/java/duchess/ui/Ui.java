@@ -1,3 +1,5 @@
+package duchess.ui;
+
 import java.util.Scanner;
 
 /**

@@ -1,3 +1,4 @@
+package duchess.exception;
 /**
  * Exception for errors in the Duchess chatbot.
  */

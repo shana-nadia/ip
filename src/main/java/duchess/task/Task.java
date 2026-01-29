@@ -1,3 +1,5 @@
+package duchess.task;
+
 /**
  * Represents one task for the user to complete.
  * Can be marked as done or not done.

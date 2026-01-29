@@ -1,4 +1,7 @@
+package duchess.list;
+
 import java.util.ArrayList;
+import duchess.task.Task;
 
 /**
  * Stores a list of tasks for the user to complete in an ArrayList.

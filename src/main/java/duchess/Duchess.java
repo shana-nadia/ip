@@ -1,4 +1,14 @@
-import java.util.Scanner;
+package duchess;
+
+import duchess.ui.Ui;
+import duchess.list.TodoList;
+import duchess.storage.FileStorage;
+import duchess.parser.Parser;
+import duchess.exception.DuchessException;
+import duchess.task.Task;
+import duchess.task.TodoTask;
+import duchess.task.DeadlineTask;
+import duchess.task.EventTask;
 
 /**
  * Starting point of the Duchess chatbot.

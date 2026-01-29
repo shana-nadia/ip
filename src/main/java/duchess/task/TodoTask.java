@@ -1,3 +1,5 @@
+package duchess.task;
+
 /**
  * A type of task without any set deadline.
  */
