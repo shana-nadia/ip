@@ -39,6 +39,9 @@ public class TodoList {
         return this.tasks.get(taskNumber);
     }
 
+    public ArrayList<Task> getTasks() {
+        return this.tasks;
+    }
     /**
      * Returns the number of tasks currently in the todolist.
      * @return the size of the todolist.
