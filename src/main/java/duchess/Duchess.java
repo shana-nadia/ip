@@ -141,7 +141,7 @@ public class Duchess {
                 }
 
                 case "delete": {
-                    if (rest.isEmpty()) {
+                    if (rest.trim().isEmpty()) {
                         throw new DuchessException("Please specify which task number to delete :(");
                     }
 
@@ -158,6 +158,26 @@ public class Duchess {
                                     + deleted + "\n"
                                     + "Now you have " + this.todolist.size() + " tasks left!"
                     );
+                    break;
+                }
+
+                case "find": {
+                    if (rest.trim().isEmpty()) {
+                        throw new DuchessException("Please specify a keyword to search for :(");
+                    }
+
+                    String keyword = rest.trim();
+                    StringBuilder res = new StringBuilder("Here are the matching tasks in your list:\n");
+                    int index = 1;
+
+                    for (Task task : this.todolist.getTasks()) {
+                        if (task.getDescription().contains(keyword)) {
+                            res.append(index).append(". ").append(task).append("\n");
+                        }
+                        index++;
+                    }
+
+                    ui.reply(res.toString());
                     break;
                 }
 
