@@ -1,6 +1,7 @@
 package duchess.list;
 
 import java.util.ArrayList;
+
 import duchess.task.Task;
 
 /**
