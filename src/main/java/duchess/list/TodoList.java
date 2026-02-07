@@ -23,15 +23,6 @@ public class TodoList {
     }
 
     /**
-     * Prints all tasks in the list in order.
-     */
-    public void print() {
-        for (int i = 0; i < this.tasks.size(); i++) {
-            System.out.println((i + 1) + ". " + getTask(i));
-        }
-    }
-
-    /**
      * Retrieves the task with the given task number.
      * @param taskNumber the number of the task to retrieve
      * @return the task with the given number
@@ -58,5 +49,21 @@ public class TodoList {
      */
     public Task deleteTask(int taskNumber) {
         return tasks.remove(taskNumber);
+    }
+
+    @Override
+    public String toString() {
+        if (tasks.isEmpty()) {
+            return "Your todo list is empty!";
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < tasks.size(); i++) {
+            stringBuilder.append(i + 1)
+                    .append(". ")
+                    .append(tasks.get(i))
+                    .append("\n");
+        }
+        return stringBuilder.toString();
     }
 }

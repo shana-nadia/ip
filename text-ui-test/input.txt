@@ -1,5 +1,0 @@
-todo read book
-deadline submit code /by tomorrow 5 pm
-event CCA briefing /from 8 pm /to 10 pm
-list
-bye
