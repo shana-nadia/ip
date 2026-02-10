@@ -42,6 +42,8 @@ public class Duchess {
     public String getResponse(String input) {
         try {
             String command = Parser.getCommand(input);
+            assert command != null : "Parsed command should not be null";
+            assert !command.isEmpty() : "Parsed command should not be empty";
             String rest = Parser.getRest(input);
 
             switch (command) {
@@ -126,6 +128,8 @@ public class Duchess {
         if (index < 0 || index >= todoList.size()) {
             throw new DuchessException("Oh no! That task number does not exist :(");
         }
+
+        assert index >= 0 && index < todoList.size() : "Task number out of bounds";
 
         return index;
     }
@@ -242,6 +246,8 @@ public class Duchess {
         }
 
         String[] parts = rest.split("/by", 2);
+        assert parts.length == 2 : "Deadline command should contain /by";
+
         String description = parts[0].trim();
         String by = parts[1].trim();
 
@@ -270,17 +276,17 @@ public class Duchess {
         commandType = TYPE_ADD;
 
         if (!rest.contains("/from") || !rest.contains("/to")) {
-            throw new DuchessException(
-                    "Please specify an event using /from and /to\n"
-                            + "Example: event project meeting /from Mon 2pm /to 4pm");
+            throw new DuchessException("Oh no! Can't have an event task without a start and end time :(");
         }
 
-        String[] fromSplit = rest.split("/from", 2);
-        String description = fromSplit[0].trim();
+        String[] first = rest.split("/from", 2);
+        String description = first[0].trim();
+        assert first.length == 2 : "Event should contain /from";
 
-        String[] toSplit = fromSplit[1].split("/to", 2);
-        String from = toSplit[0].trim();
-        String to = toSplit[1].trim();
+        String[] second = first[1].split("/to", 2);
+        String from = second[0].trim();
+        String to = second[1].trim();
+        assert second.length == 2 : "Event should contain /to";
 
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new DuchessException("Event description or time cannot be empty :(");
