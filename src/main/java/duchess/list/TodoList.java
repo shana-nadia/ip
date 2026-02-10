@@ -31,9 +31,25 @@ public class TodoList {
         return this.tasks.get(taskNumber);
     }
 
-    public ArrayList<Task> getTasks() {
-        return this.tasks;
+    /**
+     * Returns a new TodoList containing tasks whose string representation
+     * contains the given keyword.
+     *
+     * @param keyword the keyword to search for
+     * @return a TodoList of matching tasks
+     */
+    public TodoList findTasks(String keyword) {
+        TodoList matched = new TodoList();
+
+        for (Task task : tasks) {
+            if (task.toString().contains(keyword)) {
+                matched.addTask(task);
+            }
+        }
+
+        return matched;
     }
+
     /**
      * Returns the number of tasks currently in the todolist.
      * @return the size of the todolist.
