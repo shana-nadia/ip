@@ -32,10 +32,13 @@ public class TodoList {
         return this.tasks.get(taskNumber);
     }
 
-    public ArrayList<Task> getTasks() {
-        return this.tasks;
-    }
-
+    /**
+     * Returns a new TodoList containing tasks whose string representation
+     * contains the given keyword.
+     *
+     * @param keyword the keyword to search for
+     * @return a TodoList of matching tasks
+     */
     public TodoList findTasks(String keyword) {
         TodoList matched = new TodoList();
 
