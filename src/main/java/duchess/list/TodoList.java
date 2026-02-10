@@ -35,6 +35,17 @@ public class TodoList {
     public ArrayList<Task> getTasks() {
         return this.tasks;
     }
+
+    public TodoList findTasks(String keyword) {
+        TodoList matched = new TodoList();
+
+        tasks.stream()
+                .filter(task -> task.toString().contains(keyword))
+                .forEach(matched::addTask);
+
+        return matched;
+    }
+
     /**
      * Returns the number of tasks currently in the todolist.
      * @return the size of the todolist.
