@@ -28,6 +28,7 @@ public class TodoList {
      * @return the task with the given number
      */
     public Task getTask(int taskNumber) {
+        assert taskNumber >= 0 && taskNumber < tasks.size() : "Task index out of bounds in getTask";
         return this.tasks.get(taskNumber);
     }
 
@@ -59,6 +60,7 @@ public class TodoList {
      * @return the deleted task
      */
     public Task deleteTask(int taskNumber) {
+        assert taskNumber >= 0 && taskNumber < tasks.size() : "Task index out of bounds in deleteTask";
         return tasks.remove(taskNumber);
     }
 

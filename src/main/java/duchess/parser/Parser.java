@@ -12,6 +12,8 @@ public class Parser {
      */
     public static String getCommand(String input) {
         String[] parts = input.trim().split(" ", 2);
+        assert parts.length >= 1 : "Input should always have at least one part for command";
+        assert parts[0] != null && !parts[0].isEmpty() : "Command should not be null or empty";
         return parts[0];
     }
 
@@ -22,6 +24,7 @@ public class Parser {
      */
     public static String getRest(String input) {
         String[] parts = input.trim().split(" ", 2);
+        assert parts != null : "Split parts should not be null";
         return parts.length > 1 ? parts[1] : "";
     }
 }

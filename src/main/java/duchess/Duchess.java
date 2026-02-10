@@ -14,11 +14,11 @@ import duchess.task.EventTask;
  * Handles user commands and input and responds accordingly.
  */
 public class Duchess {
-    private final TodoList todolist;
+    private final TodoList todoList;
     private String commandType;
 
     public Duchess() {
-        this.todolist = FileStorage.fetchTasks();
+        this.todoList = FileStorage.fetchTasks();
     }
 
     /**
@@ -27,16 +27,20 @@ public class Duchess {
     public String getResponse(String input) {
         try {
             String command = Parser.getCommand(input);
+            assert command != null : "Parsed command should not be null";
+            assert !command.isEmpty() : "Parsed command should not be empty";
             String rest = Parser.getRest(input);
 
             switch (command) {
-            case "bye":
+            case "bye": {
                 this.commandType = "DEFAULT";
                 return "Bye! See you again next time!";
+            }
 
-            case "list":
+            case "list": {
                 this.commandType = "DEFAULT";
-                return "Here is your todo list!\n" + todolist.toString();
+                return "Here is your todo list!\n" + todoList.toString();
+                }
 
             case "mark": {
                 this.commandType = "MARK";
@@ -51,15 +55,17 @@ public class Duchess {
                     throw new DuchessException("Please enter a valid task number :(");
                 }
 
-                if (taskNumber < 0 || taskNumber >= todolist.size()) {
+                if (taskNumber < 0 || taskNumber >= todoList.size()) {
                     throw new DuchessException("Oh no! That task number does not exist :(");
                 }
 
-                todolist.getTask(taskNumber).mark();
-                FileStorage.writeTasks(todolist);
+                assert taskNumber >= 0 && taskNumber < todoList.size() : "Task number out of bounds";
+
+                todoList.getTask(taskNumber).mark();
+                FileStorage.writeTasks(todoList);
 
                 return "Congratulations on finishing your task!\n"
-                        + todolist.getTask(taskNumber);
+                        + todoList.getTask(taskNumber);
             }
 
             case "unmark": {
@@ -75,15 +81,17 @@ public class Duchess {
                     throw new DuchessException("Please enter a valid task number :(");
                 }
 
-                if (taskNumber < 0 || taskNumber >= todolist.size()) {
+                if (taskNumber < 0 || taskNumber >= todoList.size()) {
                     throw new DuchessException("Oh no! That task number does not exist :(");
                 }
 
-                todolist.getTask(taskNumber).unmark();
-                FileStorage.writeTasks(todolist);
+                assert taskNumber >= 0 && taskNumber < todoList.size() : "Task number out of bounds";
+
+                todoList.getTask(taskNumber).unmark();
+                FileStorage.writeTasks(todoList);
 
                 return "Got it! Task has been unmarked:\n"
-                        + todolist.getTask(taskNumber);
+                        + todoList.getTask(taskNumber);
             }
 
             case "todo": {
@@ -93,12 +101,12 @@ public class Duchess {
                 }
 
                 Task task = new TodoTask(rest);
-                todolist.addTask(task);
-                FileStorage.writeTasks(todolist);
+                todoList.addTask(task);
+                FileStorage.writeTasks(todoList);
 
                 return "Sure! Task added:\n"
                         + task + "\n"
-                        + "Now you have " + todolist.size() + " tasks left!";
+                        + "Now you have " + todoList.size() + " tasks left!";
             }
 
             case "deadline": {
@@ -108,13 +116,15 @@ public class Duchess {
                 }
 
                 String[] parts = rest.split(" /by ", 2);
+                assert parts.length == 2 : "Deadline command should contain /by";
+
                 Task task = new DeadlineTask(parts[0], parts[1]);
-                todolist.addTask(task);
-                FileStorage.writeTasks(todolist);
+                todoList.addTask(task);
+                FileStorage.writeTasks(todoList);
 
                 return "Sure! Task added:\n"
                         + task + "\n"
-                        + "Now you have " + todolist.size() + " tasks left!";
+                        + "Now you have " + todoList.size() + " tasks left!";
             }
 
             case "event": {
@@ -125,14 +135,16 @@ public class Duchess {
 
                 String[] first = rest.split(" /from ", 2);
                 String[] second = first[1].split(" /to ", 2);
+                assert first.length == 2 : "Event should contain /from";
+                assert second.length == 2 : "Event should contain /to";
 
                 Task task = new EventTask(first[0], second[0], second[1]);
-                todolist.addTask(task);
-                FileStorage.writeTasks(todolist);
+                todoList.addTask(task);
+                FileStorage.writeTasks(todoList);
 
                 return "Sure! Task added:\n"
                         + task + "\n"
-                        + "Now you have " + todolist.size() + " tasks left!";
+                        + "Now you have " + todoList.size() + " tasks left!";
             }
 
             case "delete": {
@@ -148,16 +160,18 @@ public class Duchess {
                     throw new DuchessException("Please enter a valid task number :(");
                 }
 
-                if (taskNumber < 0 || taskNumber >= todolist.size()) {
+                if (taskNumber < 0 || taskNumber >= todoList.size()) {
                     throw new DuchessException("Oh no! That task number does not exist :(");
                 }
 
-                Task deleted = todolist.deleteTask(taskNumber);
-                FileStorage.writeTasks(todolist);
+                assert taskNumber >= 0 && taskNumber < todoList.size() : "Task number out of bounds";
+
+                Task deleted = todoList.deleteTask(taskNumber);
+                FileStorage.writeTasks(todoList);
 
                 return "Okay! I have removed this task:\n"
                         + deleted + "\n"
-                        + "Now you have " + todolist.size() + " tasks left!";
+                        + "Now you have " + todoList.size() + " tasks left!";
             }
 
             case "find": {
@@ -170,7 +184,7 @@ public class Duchess {
                 StringBuilder res = new StringBuilder("Here are the matching tasks in your list:\n");
                 int index = 1;
 
-                for (Task task : todolist.getTasks()) {
+                for (Task task : todoList.getTasks()) {
                     if (task.getDescription().contains(keyword)) {
                         res.append(index).append(". ").append(task).append("\n");
                     }
