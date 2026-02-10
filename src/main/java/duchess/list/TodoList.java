@@ -41,11 +41,9 @@ public class TodoList {
     public TodoList findTasks(String keyword) {
         TodoList matched = new TodoList();
 
-        for (Task task : tasks) {
-            if (task.toString().contains(keyword)) {
-                matched.addTask(task);
-            }
-        }
+        tasks.stream()
+                .filter(task -> task.toString().contains(keyword))
+                .forEach(matched::addTask);
 
         return matched;
     }
