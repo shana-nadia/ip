@@ -41,6 +41,7 @@ public class Duchess {
      * Generates a response for the user's chat message.
      */
     public String getResponse(String input) {
+        input = normalizeInput(input); // ChatGPT: normalise spaces
         try {
             String command = Parser.getCommand(input);
             assert command != null : "Parsed command should not be null";
@@ -94,8 +95,12 @@ public class Duchess {
 
             default: {
                 commandType = TYPE_DEFAULT;
-                throw new DuchessException("Sorry! I don't know what that command means :(");
+                throw new DuchessException(
+                        "Sorry, I don't know what that means! Try: todo, deadline, event, list, mark, unmark, delete, " +
+                                "find, sort, bye" // Written by ChatGPT
+                );
             }
+
             }
         } catch (DuchessException e) {
             commandType = TYPE_DEFAULT;
@@ -109,6 +114,11 @@ public class Duchess {
      */
     public String getCommandType() {
         return this.commandType;
+    }
+
+    // Written by ChatGPT
+    private String normalizeInput(String input) {
+        return input.trim().replaceAll("\\s+", " ");
     }
 
     /**
@@ -133,7 +143,9 @@ public class Duchess {
         }
 
         if (index < 0 || index >= todoList.size()) {
-            throw new DuchessException("Oh no! That task number does not exist :(");
+            throw new DuchessException(
+                    "Task number must be between 1 and " + todoList.size() + " :(" // Written by ChatGPT
+            );
         }
 
         assert index >= 0 && index < todoList.size() : "Task number out of bounds";
@@ -192,6 +204,14 @@ public class Duchess {
         return message + task;
     }
 
+    // Written by ChatGPT
+    private String addTaskAndConfirm(Task task) throws DuchessException {
+        todoList.addTask(task);
+        FileStorage.writeTasks(todoList);
+        return "Got it. I've added this task:\n" + task
+                + "\nNow you have " + todoList.size() + " tasks in the list.";
+    }
+
     /**
      * Deletes a task from the todo list.
      *
@@ -227,13 +247,7 @@ public class Duchess {
         }
 
         Task task = new TodoTask(rest);
-        todoList.addTask(task);
-
-        FileStorage.writeTasks(todoList);
-
-        return "Got it. I've added this task:\n"
-                + task
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+        return addTaskAndConfirm(task);
     }
 
     /**
@@ -248,8 +262,9 @@ public class Duchess {
 
         if (!rest.contains("/by")) {
             throw new DuchessException(
-                    "Please specify a deadline using /by\n"
-                            + "Example: deadline return book /by Sunday");
+                    "Please specify a deadline using /by.\n" +
+                            "Example: deadline return book /by 2026-02-20 18:00" // Written by ChatGPT
+            );
         }
 
         String[] parts = rest.split("/by", 2);
@@ -262,19 +277,14 @@ public class Duchess {
             throw new DuchessException("Deadline description or time cannot be empty :(");
         }
 
+        validateDateTime(by); // Written by ChatGPT
+
         Task task = new DeadlineTask(description, by);
-        todoList.addTask(task);
-
-        FileStorage.writeTasks(todoList);
-
-        return "Got it. I've added this task:\n"
-                + task
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+        return addTaskAndConfirm(task);
     }
 
     /**
      * Creates and adds an event task to the todo list.
-     *
      * @param rest the user input containing the task description, start, and end time
      * @return a confirmation message showing the added task
      * @throws DuchessException if the input format is invalid or incomplete
@@ -283,7 +293,11 @@ public class Duchess {
         commandType = TYPE_ADD;
 
         if (!rest.contains("/from") || !rest.contains("/to")) {
-            throw new DuchessException("Oh no! Can't have an event task without a start and end time :(");
+            throw new DuchessException(
+                    "Event tasks require /from and /to times.\n"
+                            + "Example: event project meeting /from 2026-02-16 1400 "
+                            + "/to 2026-02-16 1500" // Written by ChatGPT
+            );
         }
 
         String[] first = rest.split("/from", 2);
@@ -293,20 +307,42 @@ public class Duchess {
         String[] second = first[1].split("/to", 2);
         String from = second[0].trim();
         String to = second[1].trim();
+
         assert second.length == 2 : "Event should contain /to";
 
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new DuchessException("Event description or time cannot be empty :(");
         }
 
+        // Written by ChatGPT
+        validateDateTime(from);
+        validateDateTime(to);
+
+        // Written by ChatGPT
+        java.time.format.DateTimeFormatter formatter =
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
+        java.time.LocalDateTime start =
+                java.time.LocalDateTime.parse(from, formatter);
+        java.time.LocalDateTime end =
+                java.time.LocalDateTime.parse(to, formatter);
+
+        if (start.isAfter(end)) {
+            throw new DuchessException("Start time must be before end time :(");
+        }
+
         Task task = new EventTask(description, from, to);
-        todoList.addTask(task);
+        return addTaskAndConfirm(task);
+    }
 
-        FileStorage.writeTasks(todoList);
-
-        return "Got it. I've added this task:\n"
-                + task
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+    // Written by ChatGPT
+    private void validateDateTime(String dateTime) throws DuchessException {
+        try {
+            // Using yyyy-MM-dd HHmm format for simplicity
+            java.time.LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new DuchessException("Please enter date/time in yyyy-MM-dd HHmm format. Example: 2026-02-16 1400");
+        }
     }
 
     /**
@@ -320,7 +356,9 @@ public class Duchess {
         commandType = TYPE_DEFAULT;
 
         if (rest.trim().isEmpty()) {
-            throw new DuchessException("Please specify a keyword to search for :(");
+            throw new DuchessException(
+                    "Please specify a keyword to search for. Example: find homework" // Written by ChatGPT
+            );
         }
 
         TodoList matchedTasks = todoList.findTasks(rest);
