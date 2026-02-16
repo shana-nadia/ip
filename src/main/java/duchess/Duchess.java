@@ -26,6 +26,7 @@ public class Duchess {
     private static final String COMMAND_EVENT = "event";
     private static final String COMMAND_DELETE = "delete";
     private static final String COMMAND_FIND = "find";
+    private static final String COMMAND_SORT = "sort";
 
     private static final String TYPE_DEFAULT = "DEFAULT";
     private static final String TYPE_ADD = "ADD";
@@ -83,6 +84,12 @@ public class Duchess {
 
             case COMMAND_FIND: {
                 return handleFind(rest);
+            }
+
+            case COMMAND_SORT: {
+                commandType = TYPE_DEFAULT;
+                todoList.sortByTime();
+                return "Got it! Tasks sorted chronologically:\n" + todoList;
             }
 
             default: {

@@ -16,6 +16,10 @@ public class DeadlineTask extends Task {
         this.deadline = LocalDate.parse(deadline);
     }
 
+    public LocalDate getDeadline() {
+        return this.deadline;
+    }
+
     /**
      * Returns a string representation of this DeadlineTask to save to data file.
      * Format: D | 0/1 | description | deadline (yyyy-MM-dd format)

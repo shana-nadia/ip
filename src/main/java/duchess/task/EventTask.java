@@ -18,6 +18,10 @@ public class EventTask extends Task {
         this.end = LocalDateTime.parse(end, INPUT_FORMAT);
     }
 
+    public LocalDateTime getStart() {
+        return this.start;
+    }
+
     /**
      * Returns a string representation of this EventTask to save to data file.
      * Format: E | 0/1 | description | start time | end time

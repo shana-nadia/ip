@@ -1,7 +1,10 @@
 package duchess.list;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import duchess.task.DeadlineTask;
+import duchess.task.EventTask;
 import duchess.task.Task;
 
 /**
@@ -65,6 +68,33 @@ public class TodoList {
     public Task deleteTask(int taskNumber) {
         assert taskNumber >= 0 && taskNumber < tasks.size() : "Task index out of bounds in deleteTask";
         return tasks.remove(taskNumber);
+    }
+
+    /**
+     * Sorts tasks chronologically.
+     * - DeadlineTask sorted by deadline date
+     * - EventTask sorted by start time
+     * - Other tasks (e.g. TodoTask) placed at the end
+     */
+    public void sortByTime() {
+        tasks.sort((t1, t2) -> {
+            LocalDateTime time1 = getTaskTime(t1);
+            LocalDateTime time2 = getTaskTime(t2);
+            return time1.compareTo(time2);
+        });
+    }
+
+    /**
+     * Returns the time used for sorting a task.
+     */
+    private LocalDateTime getTaskTime(Task task) {
+        if (task instanceof DeadlineTask) {
+            return ((DeadlineTask) task).getDeadline().atStartOfDay();
+        } else if (task instanceof EventTask) {
+            return ((EventTask) task).getStart();
+        } else {
+            return LocalDateTime.MAX;
+        }
     }
 
     @Override
