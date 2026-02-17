@@ -27,39 +27,46 @@ public class FileStorage {
         TodoList todolist = new TodoList();
         File f = new File("data/duchess.txt");
         if (!f.exists()) {
+            System.out.println("No existing data found. Starting with a fresh list, peasant!");
             return todolist;
         }
+
         try (Scanner scanner = new Scanner(f)) {
             while (scanner.hasNextLine()) {
                 String next = scanner.nextLine();
                 String[] parts = next.split(" \\| ");
-                switch (parts[0]) {
-                case "T":
-                    Task todoTask = new TodoTask(parts[2]);
-                    if (parts[1].equals("1")) {
-                        todoTask.mark();
+
+                try {
+                    switch (parts[0]) {
+                    case "T":
+                        if (parts.length < 3) throw new IllegalArgumentException("Corrupt data for TodoTask");
+                        Task todoTask = new TodoTask(parts[2]);
+                        if (parts[1].equals("1")) todoTask.mark();
+                        todolist.addTask(todoTask);
+                        break;
+                    case "D":
+                        if (parts.length < 4) throw new IllegalArgumentException("Corrupt data for DeadlineTask");
+                        Task deadlineTask = new DeadlineTask(parts[2], parts[3]);
+                        if (parts[1].equals("1")) deadlineTask.mark();
+                        todolist.addTask(deadlineTask);
+                        break;
+                    case "E":
+                        if (parts.length < 5) throw new IllegalArgumentException("Corrupt data for EventTask");
+                        Task eventTask = new EventTask(parts[2], parts[3], parts[4]);
+                        if (parts[1].equals("1")) eventTask.mark();
+                        todolist.addTask(eventTask);
+                        break;
+                    default:
+                        System.out.println("Skipping unknown task type in line: " + next);
                     }
-                    todolist.addTask(todoTask);
-                    break;
-                case "D":
-                    Task deadlineTask = new DeadlineTask(parts[2], parts[3]);
-                    if (parts[1].equals("1")) {
-                        deadlineTask.mark();
-                    }
-                    todolist.addTask(deadlineTask);
-                    break;
-                case "E":
-                    Task eventTask = new EventTask(parts[2], parts[3], parts[4]);
-                    if (parts[1].equals("1")) {
-                        eventTask.mark();
-                    }
-                    todolist.addTask(eventTask);
-                    break;
+                } catch (Exception e) {
+                    System.out.println("Skipping corrupted line: \"" + next + "\". Reason: " + e.getMessage());
                 }
             }
         } catch (FileNotFoundException e) {
-            System.out.println("You don't have any existing data file, so we're starting with an empty list! :(");
+            System.out.println("Couldn't read data file. Starting fresh, peasant!");
         }
+
         return todolist;
     }
 
@@ -81,8 +88,7 @@ public class FileStorage {
             }
             fw.close();
         } catch (IOException e) {
-            System.out.println("Couldn't save your data: " + e.getMessage() + " :(");
+                System.out.println("Couldn't save your royal ledger: " + e.getMessage());
         }
-
     }
 }

@@ -90,7 +90,8 @@ public class Duchess {
             case COMMAND_SORT: {
                 commandType = TYPE_DEFAULT;
                 todoList.sortByTime();
-                return "Got it! Tasks sorted chronologically:\n" + todoList;
+                return "Very well. I have arranged your obligations in proper chronological order, peasant:\n"
+                        + todoList;
             }
 
             default: {
@@ -210,8 +211,9 @@ public class Duchess {
     private String addTaskAndConfirm(Task task) throws DuchessException {
         todoList.addTask(task);
         FileStorage.writeTasks(todoList);
-        return "Got it. I've added this task:\n" + task
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+        return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
+                + task
+                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
     }
 
     /**
@@ -297,7 +299,7 @@ public class Duchess {
         if (!rest.contains("/from") || !rest.contains("/to")) {
             throw new DuchessException(
                     "An event without a start and end time? Even chaos has structure, peasant.\n"
-                    + "Event tasks require /from and /to times.\n"
+                            + "Event tasks require /from and /to times.\n"
                             + "Example: event project meeting /from 2026-02-16 1400 "
                             + "/to 2026-02-16 1500" // Written by ChatGPT
             );
@@ -331,7 +333,8 @@ public class Duchess {
                 java.time.LocalDateTime.parse(to, formatter);
 
         if (start.isAfter(end)) {
-            throw new DuchessException("Start time must be before end time :(");
+            throw new DuchessException("The beginning of an event cannot occur after its end, peasant. "
+                    + "Even time obeys order.");
         }
 
         Task task = new EventTask(description, from, to);
@@ -344,7 +347,10 @@ public class Duchess {
             // Using yyyy-MM-dd HHmm format for simplicity
             java.time.LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));
         } catch (java.time.format.DateTimeParseException e) {
-            throw new DuchessException("Please enter date/time in yyyy-MM-dd HHmm format. Example: 2026-02-16 1400");
+            throw new DuchessException(
+                    "You must declare time in the sacred format yyyy-MM-dd HHmm.\n"
+                            + "Example: 2026-02-16 1400"
+            );
         }
     }
 
