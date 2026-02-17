@@ -133,6 +133,12 @@ public class Duchess {
      *                          or refers to a non-existent task
      */
     private int parseTaskIndex(String rest) throws DuchessException {
+        int size = todoList.size();
+
+        if (size == 0) {
+            throw new DuchessException("Your royal ledger is empty, peasant. There are no tasks to act upon.");
+        }
+
         if (rest.trim().isEmpty()) {
             throw new DuchessException("Speak clearly, peasant. Which task number do you mean?");
         }
@@ -144,14 +150,14 @@ public class Duchess {
             throw new DuchessException("That number makes no sense in my kingdom.");
         }
 
-        if (index < 0 || index >= todoList.size()) {
-            throw new DuchessException(
-                    "Such a task number does not exist in my kingdom, peasant. Task number must be between 1 and "
-                            + todoList.size() // Written by ChatGPT
-            );
+        if (index < 0 || index >= size) {
+            String rangeMessage = size == 1
+                    ? "Task number must be 1, peasant."
+                    : "Task number must be between 1 and " + size + ", peasant.";
+            throw new DuchessException(rangeMessage);
         }
 
-        assert index >= 0 && index < todoList.size() : "Task number out of bounds";
+        assert index >= 0 && index < size : "Task number out of bounds";
 
         return index;
     }
@@ -211,9 +217,11 @@ public class Duchess {
     private String addTaskAndConfirm(Task task) throws DuchessException {
         todoList.addTask(task);
         FileStorage.writeTasks(todoList);
+        int size = todoList.size();
+        String obligationWord = size == 1 ? "obligation" : "obligations";
         return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
                 + task
-                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
+                + "\nYou now possess " + size + " " + obligationWord + " under my watch.";
     }
 
     /**
@@ -230,10 +238,12 @@ public class Duchess {
         Task removedTask = todoList.deleteTask(index);
 
         FileStorage.writeTasks(todoList);
+        int size = todoList.size();
+        String obligationWord = size == 1 ? "obligation" : "obligations";
 
         return "So be it. This task shall be erased from existence:\n"
                 + removedTask
-                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
+                + "\nYou now possess " + size + " " + obligationWord + " under my watch.";
     }
 
     /**
@@ -267,7 +277,7 @@ public class Duchess {
         if (!rest.contains("/by")) {
             throw new DuchessException(
                     "You must declare the deadline using /by.\n"
-                            + "Example: deadline buy porridge /by 2026-02-20 1800.\n" // Written by ChatGPT
+                            + "Example: deadline buy porridge /by 2026-02-20.\n"
                             + "Even royalty requires proper format, peasant.");
         }
 
@@ -278,10 +288,18 @@ public class Duchess {
         String by = parts[1].trim();
 
         if (description.isEmpty() || by.isEmpty()) {
-            throw new DuchessException("You dare submit an incomplete decree to the throne?");
+            throw new DuchessException("You dare submit an incomplete decree to the throne, peasant?");
         }
 
-        validateDateTime(by); // Written by ChatGPT
+        try {
+            java.time.LocalDate.parse(by, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new DuchessException(
+                    "The royal scroll cannot comprehend your deadline.\n"
+                            + "You must use the sacred format `YYYY-MM-DD', peasant."
+                            + "Example: 2026-02-20"
+            );
+        }
 
         Task task = new DeadlineTask(description, by);
         return addTaskAndConfirm(task);
