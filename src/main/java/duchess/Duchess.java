@@ -49,12 +49,12 @@ public class Duchess {
             switch (command) {
             case COMMAND_BYE: {
                 commandType = TYPE_DEFAULT;
-                return "Bye! See you again next time!";
+                return getFarewell();
             }
 
             case COMMAND_LIST: {
                 commandType = TYPE_DEFAULT;
-                return "Here is your todo list!\n" + todoList;
+                return "Very well. Behold your royal obligations, peasant:\n" + todoList;
             }
 
             case COMMAND_MARK: {
@@ -87,7 +87,7 @@ public class Duchess {
 
             default: {
                 commandType = TYPE_DEFAULT;
-                throw new DuchessException("Sorry! I don't know what that command means :(");
+                throw new DuchessException("Foolish peasant. That command is beneath my understanding.");
             }
             }
         } catch (DuchessException e) {
@@ -115,18 +115,18 @@ public class Duchess {
      */
     private int parseTaskIndex(String rest) throws DuchessException {
         if (rest.trim().isEmpty()) {
-            throw new DuchessException("Please specify a task number :(");
+            throw new DuchessException("Speak clearly, peasant. Which task number do you mean?");
         }
 
         int index;
         try {
             index = Integer.parseInt(rest) - 1;
         } catch (NumberFormatException e) {
-            throw new DuchessException("Please enter a valid task number :(");
+            throw new DuchessException("That number makes no sense in my kingdom.");
         }
 
         if (index < 0 || index >= todoList.size()) {
-            throw new DuchessException("Oh no! That task number does not exist :(");
+            throw new DuchessException("Such a task does not exist in my kingdom, peasant.");
         }
 
         assert index >= 0 && index < todoList.size() : "Task number out of bounds";
@@ -143,7 +143,7 @@ public class Duchess {
      */
     private String handleMark(String rest) throws DuchessException {
         return updateTaskMarkStatus(rest, true,
-                "Congratulations on finishing your task!\n");
+                "Impressive, peasant. Even I am mildly pleased.\n");
     }
 
     /**
@@ -155,7 +155,7 @@ public class Duchess {
      */
     private String handleUnmark(String rest) throws DuchessException {
         return updateTaskMarkStatus(rest, false,
-                "Got it! Task has been unmarked:\n");
+                "A shame, peasant. I expected better discipline. I shall mark this task as unfinished:\n");
     }
 
     /**
@@ -200,9 +200,9 @@ public class Duchess {
 
         FileStorage.writeTasks(todoList);
 
-        return "Noted. I've removed this task:\n"
+        return "So be it. This task shall be erased from existence:\n"
                 + removedTask
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
     }
 
     /**
@@ -216,7 +216,7 @@ public class Duchess {
         commandType = TYPE_ADD;
 
         if (rest.trim().isEmpty()) {
-            throw new DuchessException("The description of a todo cannot be empty :(");
+            throw new DuchessException("You dare present me with an incomplete decree?");
         }
 
         Task task = new TodoTask(rest);
@@ -224,9 +224,9 @@ public class Duchess {
 
         FileStorage.writeTasks(todoList);
 
-        return "Got it. I've added this task:\n"
+        return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
                 + task
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
     }
 
     /**
@@ -241,8 +241,9 @@ public class Duchess {
 
         if (!rest.contains("/by")) {
             throw new DuchessException(
-                    "Please specify a deadline using /by\n"
-                            + "Example: deadline return book /by Sunday");
+                    "You must declare the deadline using /by.\n"
+                            + "Example: deadline buy porridge /by Sunday.\n"
+                            + "Even royalty requires proper format, peasant.");
         }
 
         String[] parts = rest.split("/by", 2);
@@ -252,7 +253,7 @@ public class Duchess {
         String by = parts[1].trim();
 
         if (description.isEmpty() || by.isEmpty()) {
-            throw new DuchessException("Deadline description or time cannot be empty :(");
+            throw new DuchessException("You dare submit an incomplete decree to the throne?");
         }
 
         Task task = new DeadlineTask(description, by);
@@ -260,9 +261,9 @@ public class Duchess {
 
         FileStorage.writeTasks(todoList);
 
-        return "Got it. I've added this task:\n"
+        return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
                 + task
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
     }
 
     /**
@@ -276,7 +277,7 @@ public class Duchess {
         commandType = TYPE_ADD;
 
         if (!rest.contains("/from") || !rest.contains("/to")) {
-            throw new DuchessException("Oh no! Can't have an event task without a start and end time :(");
+            throw new DuchessException("An event without a start and end time? Even chaos has structure, peasant.");
         }
 
         String[] first = rest.split("/from", 2);
@@ -289,7 +290,7 @@ public class Duchess {
         assert second.length == 2 : "Event should contain /to";
 
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            throw new DuchessException("Event description or time cannot be empty :(");
+            throw new DuchessException("An event without proper detail? Explain yourself, peasant.");
         }
 
         Task task = new EventTask(description, from, to);
@@ -297,9 +298,9 @@ public class Duchess {
 
         FileStorage.writeTasks(todoList);
 
-        return "Got it. I've added this task:\n"
+        return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
                 + task
-                + "\nNow you have " + todoList.size() + " tasks in the list.";
+                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
     }
 
     /**
@@ -313,11 +314,27 @@ public class Duchess {
         commandType = TYPE_DEFAULT;
 
         if (rest.trim().isEmpty()) {
-            throw new DuchessException("Please specify a keyword to search for :(");
+            throw new DuchessException("Speak your keyword clearly, peasant.");
         }
 
         TodoList matchedTasks = todoList.findTasks(rest);
 
-        return "Here are the matching tasks in your list:\n" + matchedTasks;
+        return "These are the tasks that match your feeble search, peasant:\n" + matchedTasks;
+    }
+
+    /**
+     * Returns Duchess's royal greeting.
+     * @return greeting
+     */
+    public String getGreeting() {
+        return "Bow before Duchess. State your business, peasant.";
+    }
+
+    /**
+     * Returns Duchess's royal farewell
+     * @return farewell
+     */
+    public String getFarewell() {
+        return "You are dismissed, peasant. Return when you require my wisdom again.";
     }
 }
