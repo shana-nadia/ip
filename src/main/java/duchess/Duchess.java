@@ -26,6 +26,7 @@ public class Duchess {
     private static final String COMMAND_EVENT = "event";
     private static final String COMMAND_DELETE = "delete";
     private static final String COMMAND_FIND = "find";
+    private static final String COMMAND_SORT = "sort";
 
     private static final String TYPE_DEFAULT = "DEFAULT";
     private static final String TYPE_ADD = "ADD";
@@ -40,6 +41,7 @@ public class Duchess {
      * Generates a response for the user's chat message.
      */
     public String getResponse(String input) {
+        input = normalizeInput(input); // ChatGPT: normalise spaces
         try {
             String command = Parser.getCommand(input);
             assert command != null : "Parsed command should not be null";
@@ -85,10 +87,21 @@ public class Duchess {
                 return handleFind(rest);
             }
 
+            case COMMAND_SORT: {
+                commandType = TYPE_DEFAULT;
+                todoList.sortByTime();
+                return "Got it! Tasks sorted chronologically:\n" + todoList;
+            }
+
             default: {
                 commandType = TYPE_DEFAULT;
-                throw new DuchessException("Foolish peasant. That command is beneath my understanding.");
+                throw new DuchessException(
+                        "Foolish peasant. That command is beneath my understanding. "
+                                + "Try: todo, deadline, event, list, mark, unmark, delete, "
+                                + "find, sort, bye" // Written by ChatGPT
+                );
             }
+
             }
         } catch (DuchessException e) {
             commandType = TYPE_DEFAULT;
@@ -102,6 +115,11 @@ public class Duchess {
      */
     public String getCommandType() {
         return this.commandType;
+    }
+
+    // Written by ChatGPT
+    private String normalizeInput(String input) {
+        return input.trim().replaceAll("\\s+", " ");
     }
 
     /**
@@ -126,7 +144,10 @@ public class Duchess {
         }
 
         if (index < 0 || index >= todoList.size()) {
-            throw new DuchessException("Such a task does not exist in my kingdom, peasant.");
+            throw new DuchessException(
+                    "Such a task number does not exist in my kingdom, peasant. Task number must be between 1 and "
+                            + todoList.size() // Written by ChatGPT
+            );
         }
 
         assert index >= 0 && index < todoList.size() : "Task number out of bounds";
@@ -185,6 +206,14 @@ public class Duchess {
         return message + task;
     }
 
+    // Written by ChatGPT
+    private String addTaskAndConfirm(Task task) throws DuchessException {
+        todoList.addTask(task);
+        FileStorage.writeTasks(todoList);
+        return "Got it. I've added this task:\n" + task
+                + "\nNow you have " + todoList.size() + " tasks in the list.";
+    }
+
     /**
      * Deletes a task from the todo list.
      *
@@ -220,13 +249,7 @@ public class Duchess {
         }
 
         Task task = new TodoTask(rest);
-        todoList.addTask(task);
-
-        FileStorage.writeTasks(todoList);
-
-        return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
-                + task
-                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
+        return addTaskAndConfirm(task);
     }
 
     /**
@@ -242,7 +265,7 @@ public class Duchess {
         if (!rest.contains("/by")) {
             throw new DuchessException(
                     "You must declare the deadline using /by.\n"
-                            + "Example: deadline buy porridge /by Sunday.\n"
+                            + "Example: deadline buy porridge /by 2026-02-20 1800.\n" // Written by ChatGPT
                             + "Even royalty requires proper format, peasant.");
         }
 
@@ -256,19 +279,14 @@ public class Duchess {
             throw new DuchessException("You dare submit an incomplete decree to the throne?");
         }
 
+        validateDateTime(by); // Written by ChatGPT
+
         Task task = new DeadlineTask(description, by);
-        todoList.addTask(task);
-
-        FileStorage.writeTasks(todoList);
-
-        return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
-                + task
-                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
+        return addTaskAndConfirm(task);
     }
 
     /**
      * Creates and adds an event task to the todo list.
-     *
      * @param rest the user input containing the task description, start, and end time
      * @return a confirmation message showing the added task
      * @throws DuchessException if the input format is invalid or incomplete
@@ -277,7 +295,12 @@ public class Duchess {
         commandType = TYPE_ADD;
 
         if (!rest.contains("/from") || !rest.contains("/to")) {
-            throw new DuchessException("An event without a start and end time? Even chaos has structure, peasant.");
+            throw new DuchessException(
+                    "An event without a start and end time? Even chaos has structure, peasant.\n"
+                    + "Event tasks require /from and /to times.\n"
+                            + "Example: event project meeting /from 2026-02-16 1400 "
+                            + "/to 2026-02-16 1500" // Written by ChatGPT
+            );
         }
 
         String[] first = rest.split("/from", 2);
@@ -287,20 +310,42 @@ public class Duchess {
         String[] second = first[1].split("/to", 2);
         String from = second[0].trim();
         String to = second[1].trim();
+
         assert second.length == 2 : "Event should contain /to";
 
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new DuchessException("An event without proper detail? Explain yourself, peasant.");
         }
 
+        // Written by ChatGPT
+        validateDateTime(from);
+        validateDateTime(to);
+
+        // Written by ChatGPT
+        java.time.format.DateTimeFormatter formatter =
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+
+        java.time.LocalDateTime start =
+                java.time.LocalDateTime.parse(from, formatter);
+        java.time.LocalDateTime end =
+                java.time.LocalDateTime.parse(to, formatter);
+
+        if (start.isAfter(end)) {
+            throw new DuchessException("Start time must be before end time :(");
+        }
+
         Task task = new EventTask(description, from, to);
-        todoList.addTask(task);
+        return addTaskAndConfirm(task);
+    }
 
-        FileStorage.writeTasks(todoList);
-
-        return "As you command, peasant. I have inscribed this task into the royal ledger:\n"
-                + task
-                + "\nYou now possess " + todoList.size() + " obligations under my watch.";
+    // Written by ChatGPT
+    private void validateDateTime(String dateTime) throws DuchessException {
+        try {
+            // Using yyyy-MM-dd HHmm format for simplicity
+            java.time.LocalDateTime.parse(dateTime, java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm"));
+        } catch (java.time.format.DateTimeParseException e) {
+            throw new DuchessException("Please enter date/time in yyyy-MM-dd HHmm format. Example: 2026-02-16 1400");
+        }
     }
 
     /**
@@ -314,7 +359,7 @@ public class Duchess {
         commandType = TYPE_DEFAULT;
 
         if (rest.trim().isEmpty()) {
-            throw new DuchessException("Speak your keyword clearly, peasant.");
+            throw new DuchessException("Speak your keyword clearly, peasant. Example: find farmwork");
         }
 
         TodoList matchedTasks = todoList.findTasks(rest);
