@@ -32,6 +32,7 @@ public class Duchess {
     private static final String TYPE_ADD = "ADD";
     private static final String TYPE_MARK = "MARK";
     private static final String TYPE_DELETE = "DELETE";
+    private static final String TYPE_EXIT = "EXIT";
 
     public Duchess() {
         this.todoList = FileStorage.fetchTasks();
@@ -50,7 +51,7 @@ public class Duchess {
 
             switch (command) {
             case COMMAND_BYE: {
-                commandType = TYPE_DEFAULT;
+                commandType = TYPE_EXIT;
                 return getFarewell();
             }
 
@@ -89,6 +90,13 @@ public class Duchess {
 
             case COMMAND_SORT: {
                 commandType = TYPE_DEFAULT;
+
+                if (!rest.trim().isEmpty()) {
+                    throw new DuchessException(
+                            "The sort command requires no additional arguments, peasant."
+                    );
+                }
+
                 todoList.sortByTime();
                 return "Very well. I have arranged your obligations in proper chronological order, peasant:\n"
                         + todoList;
@@ -296,7 +304,7 @@ public class Duchess {
         } catch (java.time.format.DateTimeParseException e) {
             throw new DuchessException(
                     "The royal scroll cannot comprehend your deadline.\n"
-                            + "You must use the sacred format `YYYY-MM-DD', peasant."
+                            + "You must use the sacred format `YYYY-MM-DD', peasant.\n"
                             + "Example: 2026-02-20"
             );
         }

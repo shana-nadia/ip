@@ -1,12 +1,19 @@
 package duchess.ui;
 
+import javafx.animation.PauseTransition;
+
+import javafx.application.Platform;
+
 import javafx.fxml.FXML;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+
+import javafx.util.Duration;
 
 import duchess.Duchess;
 /**
@@ -59,5 +66,11 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getDuchessDialog(response, duchessImage, commandType)
         );
         userInput.clear();
+
+        if ("EXIT".equals(commandType)) {
+            PauseTransition delay = new PauseTransition(Duration.seconds(2));
+            delay.setOnFinished(event -> Platform.exit());
+            delay.play();
+        }
     }
 }
